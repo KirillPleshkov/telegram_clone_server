@@ -18,4 +18,3 @@ class UserViewSet(viewsets.ViewSet):
         user = get_object_or_404(self.queryset, id=request.user.id)
         serializer = self.serializer_class(user)
         return Response(serializer.data)
-

@@ -3,19 +3,27 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
+from chat.models import ChatUserM2M
+
 user_model = get_user_model()
+
+
+class ChatsInline(admin.TabularInline):
+    model = ChatUserM2M
+    fields = ("chat", "role")
+    autocomplete_fields = ("user",)
+    extra = 0
 
 
 @admin.register(user_model)
 class CustomUserAdmin(UserAdmin):
-    # add_form = CustomUserCreationForm
-    # form = CustomUserChangeForm
-
     list_display = ('username', 'first_last_name', 'is_active',)
     list_filter = ('is_staff', 'is_active',)
 
     search_fields = ('username', 'first_name', 'last_name')
     ordering = ('username',)
+
+    inlines = (ChatsInline,)
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),

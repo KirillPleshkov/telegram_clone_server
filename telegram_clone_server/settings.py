@@ -17,7 +17,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,12 +38,14 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "dj_rest_auth.registration",
     "corsheaders",
+    "channels",
 
     "allauth.socialaccount.providers.github",
     "allauth.socialaccount.providers.yandex",
 
     'authentication',
-    'user'
+    'user',
+    'chat'
 ]
 
 MIDDLEWARE = [
@@ -75,6 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'telegram_clone_server.wsgi.application'
+ASGI_APPLICATION = 'telegram_clone_server.asgi.application'
 
 DATABASES = {
     'default': {
@@ -85,6 +91,15 @@ DATABASES = {
         'HOST': env('DATABASE_HOST'),
         'PORT': env('DATABASE_PORT'),
     }}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 LANGUAGE_CODE = 'ru'
 
@@ -119,6 +134,8 @@ SIMPLE_JWT = {
     "ALGORITHM": "HS512",
 }
 
+QR_TOKEN_LIFETIME = timedelta(seconds=30)
+
 AUTH_PWD_MODULE = "django.contrib.auth.password_validation."
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -151,13 +168,30 @@ REST_AUTH = {
 }
 
 # corsheaders
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000/",
-        "http://127.0.0.1:3000/",
-    ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# if DEBUG:
+#
+# else:
+#     CORS_ALLOWED_ORIGINS = [
+#         "http://localhost:3000/",
+#         "http://127.0.0.1:3000/",
+#     ]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Authorization',
+    'Access-Control-Allow-Origin'
+]
 
 # allauth SOCIALACCOUNT
 

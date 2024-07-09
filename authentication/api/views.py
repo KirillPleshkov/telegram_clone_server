@@ -1,13 +1,22 @@
 import re
-
 import requests
+import jwt
+
 from allauth.account.adapter import get_adapter
+from asgiref.sync import async_to_sync
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
 from allauth.socialaccount.providers.yandex.views import YandexAuth2Adapter
+from dj_rest_auth.utils import jwt_encode
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files import File
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from channels.layers import get_channel_layer
+
+from telegram_clone_server import settings
 
 
 class CustomGithubOAuth2Adapter(GitHubOAuth2Adapter):
@@ -72,3 +81,24 @@ class YandexLogin(SocialLoginView):
     def process_login(self):
         get_adapter(self.request).login(self.request, self.user)
         download_image(self.user)
+
+
+channel_layer = get_channel_layer()
+
+
+class LoginByQR(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        channel_name = ''
+        try:
+            qr_token = request.data['qr_token']
+            decoded_jwt = jwt.decode(qr_token, settings.SECRET_KEY, algorithms=["HS256"])
+            channel_name = decoded_jwt['channel_name']
+        except:
+            return Response({'success': False})
+        user = request.user
+        _, refresh_token = jwt_encode(user)
+        async_to_sync(channel_layer.send)(channel_name, {'type': 'qr.login', 'text': str(refresh_token)})
+
+        return Response({'success': True})

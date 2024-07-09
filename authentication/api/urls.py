@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenVerifyView
 from django.urls import path
 
-from authentication.api.views import GithubLogin, YandexLogin
+from authentication.api.views import GithubLogin, YandexLogin, LoginByQR
 from telegram_clone_server import settings
 
 urlpatterns = [
@@ -17,4 +17,6 @@ urlpatterns = [
 
     path("github/", GithubLogin.as_view(), name="github_login"),
     path("yandex/", YandexLogin.as_view(), name="yandex_login"),
+
+    path("qr_login/", LoginByQR.as_view(), name="qr_login")
 ]
