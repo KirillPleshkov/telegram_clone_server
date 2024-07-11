@@ -7,7 +7,8 @@ from telegram_clone_server import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/authentication/', include('authentication.api.urls')),
-    path('api/user/', include('user.api.urls'))
+    path('api/user/', include('user.api.urls')),
+    path('api/chat/', include('chat.api.urls'))
 ]
 
 if settings.DEBUG:

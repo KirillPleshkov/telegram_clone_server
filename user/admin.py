@@ -1,7 +1,11 @@
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialToken, SocialApp
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
+from rest_framework.authtoken.models import TokenProxy
 
 from chat.models import ChatUserM2M
 
@@ -44,4 +48,10 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.unregister(Group)
+admin.site.unregister(TokenProxy)
+admin.site.unregister(Site)
+admin.site.unregister(SocialToken)
+admin.site.unregister(SocialApp)
+admin.site.unregister(EmailAddress)
+
 
